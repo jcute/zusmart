@@ -1,1 +1,10 @@
-# zusmart
+# zusmart(v1.0.0)
+## 目前是一款基于NIO的开源框架,功能类似于Netty,Mina
+## 后续规划
+1. 实现HTTP协议
+2. 自定义大文件传输协议及断点续传
+3. 基于HTTP协议实现MVC框架
+4. 实现IOC,AOP,Cache
+5. 基于自定义协议实现RPC框架
+6. 实现分布式服务
+7. 实现WebUI的Monitor
