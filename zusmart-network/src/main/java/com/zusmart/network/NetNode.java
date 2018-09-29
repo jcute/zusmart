@@ -12,7 +12,7 @@ public interface NetNode extends Executable{
 	
 	public NetAddress getServerAddress();
 	
-	public SocketSessionManager getSessionManager();
+	public SocketSessionManager getSocketSessionManager();
 	
 	public SocketSessionAdapter getSocketSessionAdapter();
 	

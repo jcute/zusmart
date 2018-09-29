@@ -46,11 +46,6 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	}
 
 	@Override
-	public SocketSessionManager getSessionManager() {
-		return this.socketSessionManager;
-	}
-
-	@Override
 	public SocketBossEventLoopGroup getSocketBossEventLoopGroup() {
 		return this.socketBossEventLoopGroup;
 	}

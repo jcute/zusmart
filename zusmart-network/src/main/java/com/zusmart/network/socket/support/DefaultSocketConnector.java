@@ -77,6 +77,11 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 	}
 
 	@Override
+	public SocketSession getSocketSession() {
+		return this.socketSession;
+	}
+
+	@Override
 	public boolean isOpen() {
 		return null != this.socketChannel && this.socketChannel.isOpen();
 	}
@@ -100,7 +105,10 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 			return;
 		}
 		this.running = false;
+		this.socketSession.close();
 		CloseUtils.close(this.socketChannel);
+		this.socketSession = null;
+		this.socketChannel = null;
 	}
 
 	protected SocketSession createSocketSession(SocketChannel socketChannel) {

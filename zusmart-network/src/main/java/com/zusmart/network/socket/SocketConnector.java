@@ -14,6 +14,8 @@ public interface SocketConnector extends Executable {
 	public NetAddress getServerAddress();
 
 	public NetAddress getClientAddress();
+	
+	public SocketSession getSocketSession();
 
 	public boolean isOpen();
 
