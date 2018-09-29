@@ -164,7 +164,7 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 		SocketBossEventLoop socketBossEventLoop = this.socketBossEventLoopGroup.getEventLoop();
 		SocketWorkEventLoop socketWorkEventLoop = this.socketWorkEventLoopGroup.getEventLoop();
 		SocketChannel socketChannel = this.serverSocketChannel.accept();
-		SocketSession socketSession = this.socketSessionManager.createSocketSession(socketChannel, socketBossEventLoop, socketWorkEventLoop);
+		SocketSession socketSession = this.socketSessionManager.createSocketSession(true,socketChannel, socketBossEventLoop, socketWorkEventLoop);
 		socketBossEventLoop.doRegister(socketSession);
 	}
 

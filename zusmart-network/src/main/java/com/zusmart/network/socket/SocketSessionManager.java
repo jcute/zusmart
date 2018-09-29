@@ -11,7 +11,7 @@ public interface SocketSessionManager extends Executable, Iterable<Entry<String,
 
 	public SocketSessionSequenceGenerator getSocketSessionSequenceGenerator();
 
-	public SocketSession createSocketSession(SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop);
+	public SocketSession createSocketSession(boolean isServerSide,SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop);
 
 	public SocketSession getSocketSession(String socketSessionSequence);
 

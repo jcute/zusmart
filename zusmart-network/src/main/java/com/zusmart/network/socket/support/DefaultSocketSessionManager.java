@@ -60,8 +60,8 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 	}
 
 	@Override
-	public SocketSession createSocketSession(SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
-		SocketSession socketSession = this.createSocketSession(true, socketChannel, socketBossEventLoop, socketWorkEventLoop);
+	public SocketSession createSocketSession(boolean isServerSide, SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
+		SocketSession socketSession = this.doCreateSocketSession(isServerSide, socketChannel, socketBossEventLoop, socketWorkEventLoop);
 		socketSession.getSocketSessionHandlerChain().addLast("SESSION_MANAGER", new DefaultSocketSessionHandler() {
 
 			@Override
@@ -143,7 +143,7 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 
 			try {
 				this.checkSessionTimeout();
-				synchronized(this){
+				synchronized (this) {
 					this.wait(this.checkInterval);
 				}
 			} catch (Exception e) {
@@ -153,7 +153,7 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 		}
 
 		this.doClear();
-		
+
 	}
 
 	protected void doClear() {
@@ -179,7 +179,7 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 		}
 	}
 
-	protected SocketSession createSocketSession(boolean isServerSide, SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
+	protected SocketSession doCreateSocketSession(boolean isServerSide, SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
 		String socketSessionSequence = this.generator.create();
 		return new DefaultSocketSession(isServerSide, socketSessionSequence, socketChannel, socketBossEventLoop, socketWorkEventLoop, this.socketSessionAdapter, this.readBufferSize, this.useDirect);
 	}
