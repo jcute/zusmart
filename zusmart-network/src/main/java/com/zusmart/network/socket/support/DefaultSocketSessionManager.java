@@ -134,11 +134,11 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 			SocketSession socketSession = null;
 			while ((socketSession = this.onMonitorQueue.poll()) != null) {
 				this.sessions.put(socketSession.getSocketSessionSequence(), socketSession);
-				logger.debug("Attach session success [{}]", socketSession.getSocketSessionSequence());
+				logger.debug("Attach session success [{}]", socketSession.toString());
 			}
 			while ((socketSession = this.onTimeoutQueue.poll()) != null) {
 				this.sessions.remove(socketSession.getSocketSessionSequence());
-				logger.debug("Detach session success [{}]", socketSession.getSocketSessionSequence());
+				logger.debug("Detach session success [{}]", socketSession.toString());
 			}
 
 			try {

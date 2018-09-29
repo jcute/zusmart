@@ -274,7 +274,7 @@ public class DefaultSocketSession implements SocketSession {
 
 	@Override
 	public String toString() {
-		return String.format("isOpen:%s [%s -> %s]", this.isOpen(), this.isServerSide ? this.clientAddress : this.serverAddress, this.isServerSide ? this.serverAddress : this.clientAddress);
+		return String.format("SessionID:%s IsOpened:%s [%s -> %s]", this.getSocketSessionSequence(), this.isOpen(), this.isServerSide ? this.serverAddress : this.clientAddress, this.isServerSide ? this.clientAddress : this.serverAddress);
 	}
 
 	protected void initSocketAddress() {
