@@ -22,7 +22,7 @@ public class TestHttpClient implements SocketSessionAdapter{
 		chain.addLast("demo",new DefaultSocketSessionHandler() {
 			@Override
 			public void onMessage(SocketSession session, Message message) {
-				System.out.println(message);
+				System.err.println("客户端收到消息："+message);
 				session.close();
 			}
 		});
@@ -39,10 +39,6 @@ public class TestHttpClient implements SocketSessionAdapter{
 		
 		SocketSession socketSession = client.getSocketConnector().getSocketSession();
 		socketSession.writeAndFlush(msg);
-		
-		System.in.read();
-		
-		client.close();
 		
 	}
 

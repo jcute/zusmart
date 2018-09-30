@@ -23,24 +23,25 @@ public class TestHttpServer implements SocketSessionAdapter {
 
 			@Override
 			public void onRegister(SocketSession session) {
-				System.err.println("客户端上线:" + session);
+//				System.err.println("客户端上线:" + session);
 			}
 
 			@Override
 			public void unRegister(SocketSession session) {
-				System.err.println("客户端下线:" + session);
+//				System.err.println("客户端下线:" + session);
 			}
 
 			@Override
 			public void onMessage(SocketSession session, Message message) {
+//				System.err.println("服务端收到消息：" + message);
 				StringMessage msg = new StringMessage();
-				msg.setContent("HTTP/1.1 200 OK\nContent-Length:5\n\nHello");
+				msg.setContent("HTTP/1.1 200 OK\nContent-Length:5\r\n\r\nHello");
 				session.writeAndFlush(msg);
 			}
 
 			@Override
 			public void onTimeout(SocketSession session) {
-				System.err.println("会话超时:" + session);
+//				System.err.println("会话超时:" + session);
 			}
 
 			@Override
@@ -54,7 +55,7 @@ public class TestHttpServer implements SocketSessionAdapter {
 	public static void main(String[] args) throws Exception {
 
 		NetServerSetting setting = new NetServerSetting();
-		setting.setSessionTimeoutMillis(5000);//设置超时时间为5秒
+		// setting.setSessionTimeoutMillis(5000);//设置超时时间为5秒
 		NetServer netServer = new DefaultNetServer(NetAddress.create(9080), setting, new TestHttpServer());
 		netServer.start();
 

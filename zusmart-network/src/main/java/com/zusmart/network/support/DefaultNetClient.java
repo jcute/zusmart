@@ -5,8 +5,10 @@ import com.zusmart.basic.logging.LoggerFactory;
 import com.zusmart.network.NetAddress;
 import com.zusmart.network.NetClient;
 import com.zusmart.network.NetClientSetting;
+import com.zusmart.network.handler.support.DefaultSocketSessionHandler;
 import com.zusmart.network.socket.SocketBossEventLoopGroup;
 import com.zusmart.network.socket.SocketConnector;
+import com.zusmart.network.socket.SocketSession;
 import com.zusmart.network.socket.SocketSessionAdapter;
 import com.zusmart.network.socket.SocketSessionManager;
 import com.zusmart.network.socket.SocketSessionSequenceGenerator;
@@ -76,6 +78,7 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 		this.socketWorkEventLoopGroup.start();
 		this.socketBossEventLoopGroup.start();
 		this.socketConnector.start();
+		this.initSocketSessionListener(this.socketConnector.getSocketSession());
 		logger.info("Net Client Start Success");
 	}
 
@@ -90,6 +93,19 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 		this.socketBossEventLoopGroup = null;
 		this.socketConnector = null;
 		logger.info("Net Client Close Success");
+	}
+
+	protected void initSocketSessionListener(SocketSession socketSession) {
+		socketSession.getSocketSessionHandlerChain().addLast("listener", new DefaultSocketSessionHandler() {
+			@Override
+			public void unRegister(SocketSession session) {
+				try {
+					DefaultNetClient.this.close();
+				} catch (Exception e) {
+					// IGNORE
+				}
+			}
+		});
 	}
 
 	protected SocketConnector createSocketConnector(NetAddress netAddress) {
