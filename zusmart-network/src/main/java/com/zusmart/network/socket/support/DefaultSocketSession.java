@@ -146,6 +146,7 @@ public class DefaultSocketSession implements SocketSession {
 		this.writerBufferQueue = new LinkedList<Buffer>();
 		this.writerBuffer = null;
 		this.registTime = System.currentTimeMillis();
+		this.activeTime = System.currentTimeMillis();
 		this.socketWorkEventLoop.submit(new Runnable() {
 			@Override
 			public void run() {

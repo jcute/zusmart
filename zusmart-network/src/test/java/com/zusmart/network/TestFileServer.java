@@ -20,7 +20,14 @@ public class TestFileServer implements SocketSessionAdapter {
 	@Override
 	public void initSocketSessionHandlerChain(SocketSessionHandlerChain chain) {
 		chain.addLast("monitor", new DefaultSocketSessionHandler() {
-
+			@Override
+			public void onRegister(SocketSession session) {
+				System.out.println("客户端上线：" + session.getClientAddress());
+			}
+			@Override
+			public void unRegister(SocketSession session) {
+				System.out.println("客户端下线：" + session.getClientAddress());
+			}
 			@Override
 			public void onMessage(SocketSession session, Message message) {
 				ByteArrayMessage msg = (ByteArrayMessage) message;
@@ -32,7 +39,7 @@ public class TestFileServer implements SocketSessionAdapter {
 
 	public static void main(String[] args) throws Exception {
 		NetServerSetting setting = new NetServerSetting();
-		NetServer netServer = new DefaultNetServer(NetAddress.create(9080), setting, new TestHttpServer());
+		NetServer netServer = new DefaultNetServer(NetAddress.create(9080), setting, new TestFileServer());
 		netServer.start();
 
 		System.in.read();

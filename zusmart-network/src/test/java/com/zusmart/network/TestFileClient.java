@@ -26,6 +26,12 @@ public class TestFileClient implements SocketSessionAdapter {
 			public void unRegister(SocketSession session) {
 				System.out.println("un register");
 			}
+
+			@Override
+			public void onTimeout(SocketSession session) {
+				System.out.println("on timeout");
+			}
+
 			@Override
 			public void onException(SocketSession session, Throwable cause) {
 				cause.printStackTrace();

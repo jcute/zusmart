@@ -181,9 +181,9 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 			SocketSession socketSession = entry.getValue();
 			long lastActiveTime = socketSession.getAcitveTime();
 			long currActiveTime = System.currentTimeMillis();
-
 			if (currActiveTime - lastActiveTime > this.sessionTimeoutMillis) {
 				socketSession.getSocketBossEventLoop().doTimeout(socketSession);
+				logger.debug("Client timeout and disconnect {}",socketSession);
 			}
 		}
 	}
