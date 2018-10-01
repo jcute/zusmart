@@ -2,9 +2,11 @@ package com.zusmart.network.socket.support;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.CountDownLatch;
 
 import com.zusmart.basic.toolkit.support.AbstractExecutable;
 import com.zusmart.network.NetAddress;
+import com.zusmart.network.handler.support.DefaultSocketSessionHandler;
 import com.zusmart.network.socket.SocketBossEventLoop;
 import com.zusmart.network.socket.SocketBossEventLoopGroup;
 import com.zusmart.network.socket.SocketConnector;
@@ -91,12 +93,20 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 		if (this.running == true) {
 			return;
 		}
+		final CountDownLatch latch = new CountDownLatch(1);
 		this.running = true;
 		this.socketChannel = SocketChannel.open();
 		this.socketChannel.connect(this.netAddress.toSocketAddress());
 		this.socketChannel.finishConnect();
 		this.socketSession = this.createSocketSession(this.socketChannel);
+		this.socketSession.getSocketSessionHandlerChain().addLast("INTERNAL_WATTING", new DefaultSocketSessionHandler() {
+			@Override
+			public void onRegister(SocketSession session) {
+				latch.countDown();
+			}
+		});
 		this.socketSession.getSocketBossEventLoop().doRegister(this.socketSession);
+		latch.await();
 	}
 
 	@Override

@@ -21,6 +21,10 @@ public interface SocketSession extends SocketSessionContext {
 	public long getRegistTime();
 
 	public long getAcitveTime();
+	
+	public long getReaderDataLength();
+	
+	public long getWriterDataLength();
 
 	public void fireOnRegister(Selector selector) throws Exception;
 

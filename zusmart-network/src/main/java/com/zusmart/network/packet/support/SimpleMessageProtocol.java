@@ -11,8 +11,8 @@ public abstract class SimpleMessageProtocol<T extends Message> implements Messag
 	public final Buffer encode(Message message) throws Exception {
 		try {
 			return this.doEncode((T) message);
-		} catch (ClassCastException e) {
-			return null;
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 

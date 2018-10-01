@@ -46,10 +46,16 @@ public class TestFileClient implements SocketSessionAdapter {
 		client.start();
 
 		SocketSession session = client.getSocketConnector().getSocketSession();
+		System.err.println(session);
+		
 		ByteArrayMessage msg = new ByteArrayMessage();
 		msg.setContent(file2byte("/Users/tangbin/Downloads/data.csv"));
 		System.out.println(msg.getContent().length);
 		session.writeAndFlush(msg);
+		
+		System.in.read();
+		
+		session.close();
 
 	}
 

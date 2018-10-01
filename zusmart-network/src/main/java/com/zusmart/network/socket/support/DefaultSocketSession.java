@@ -40,6 +40,9 @@ public class DefaultSocketSession implements SocketSession {
 	private long registTime;
 	private long activeTime;
 
+	private long readerDataLength;
+	private long writerDataLength;
+
 	private SelectionKey selectionKey;
 	private NetAddress serverAddress;
 	private NetAddress clientAddress;
@@ -139,6 +142,16 @@ public class DefaultSocketSession implements SocketSession {
 	}
 
 	@Override
+	public long getReaderDataLength() {
+		return this.readerDataLength;
+	}
+
+	@Override
+	public long getWriterDataLength() {
+		return this.writerDataLength;
+	}
+
+	@Override
 	public void fireOnRegister(Selector selector) throws Exception {
 		this.socketChannel.configureBlocking(false);
 		this.selectionKey = this.socketChannel.register(selector, EVENT_READABLE, this);
@@ -170,6 +183,7 @@ public class DefaultSocketSession implements SocketSession {
 				total += limit;
 			}
 			this.activeTime = System.currentTimeMillis();
+			this.readerDataLength += total;
 		} catch (ClosedChannelException e) {
 			buffer.release();
 			this.fireUnRegister();
@@ -180,8 +194,6 @@ public class DefaultSocketSession implements SocketSession {
 		}
 
 		if (total > 0) {
-			buffer.flip();
-
 			try {
 				final Message message = this.messageProtocol.decode(buffer);
 				buffer.release();
@@ -214,8 +226,9 @@ public class DefaultSocketSession implements SocketSession {
 			return;
 		}
 		try {
+			this.writerBuffer.flip();
 			while (this.writerBuffer.hasRemaining()) {
-				this.writerBuffer.write(this.socketChannel);
+				this.writerDataLength += this.writerBuffer.write(this.socketChannel);
 			}
 		} catch (ClosedChannelException e) {
 			this.fireUnRegister();
@@ -242,7 +255,7 @@ public class DefaultSocketSession implements SocketSession {
 
 	@Override
 	public void fireUnRegister() {
-		if(this.isOpen()) {
+		if (this.isOpen()) {
 			this.socketWorkEventLoop.submit(new Runnable() {
 				@Override
 				public void run() {

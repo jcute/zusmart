@@ -14,12 +14,14 @@ public class StringMessageProtocol implements MessageProtocol {
 	public Buffer encode(Message message) throws Exception {
 		StringMessage msg = (StringMessage) message;
 		byte[] data = msg.getContent().getBytes();
-		return BufferFactory.wrap(data);
+		Buffer buffer = BufferFactory.allocate(data.length);
+		buffer.put(data);
+		return buffer;
 	}
 
 	@Override
 	public Message decode(Buffer buffer) throws Exception {
-
+		buffer.flip();
 		int index = buffer.indexOf(token);
 		if (index >= 0) {
 			String content = buffer.getString(Charset.UTF8, index + token.length);

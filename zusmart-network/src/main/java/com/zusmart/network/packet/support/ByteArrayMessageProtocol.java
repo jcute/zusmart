@@ -9,9 +9,10 @@ public class ByteArrayMessageProtocol extends SimpleMessageProtocol<ByteArrayMes
 	protected Buffer doEncode(ByteArrayMessage message) throws Exception {
 		byte[] content = message.getContent();
 		Buffer buffer = null;
-		if (null == content) {
+		if (null == content || content.length == 0) {
 			buffer = BufferFactory.allocate(4);
 			buffer.putInt(0);
+			buffer.put(new byte[0]);
 		} else {
 			buffer = BufferFactory.allocate(content.length + 4);
 			buffer.putInt(content.length);
@@ -22,6 +23,7 @@ public class ByteArrayMessageProtocol extends SimpleMessageProtocol<ByteArrayMes
 
 	@Override
 	protected ByteArrayMessage doDecode(Buffer buffer) throws Exception {
+		buffer.flip();
 		if (buffer.remaining() < 4) {
 			return null;
 		}
