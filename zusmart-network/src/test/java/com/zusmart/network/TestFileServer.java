@@ -1,5 +1,8 @@
 package com.zusmart.network;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import com.zusmart.network.handler.SocketSessionHandlerChain;
 import com.zusmart.network.handler.support.DefaultSocketSessionHandler;
 import com.zusmart.network.packet.Message;
@@ -24,14 +27,28 @@ public class TestFileServer implements SocketSessionAdapter {
 			public void onRegister(SocketSession session) {
 				System.out.println("客户端上线：" + session.getClientAddress());
 			}
+
 			@Override
 			public void unRegister(SocketSession session) {
 				System.out.println("客户端下线：" + session.getClientAddress());
 			}
+
 			@Override
 			public void onMessage(SocketSession session, Message message) {
 				ByteArrayMessage msg = (ByteArrayMessage) message;
 				System.out.println("接收文件大小为:" + msg.getContent().length);
+				try {
+					File file = new File("/Users/tangbin/Downloads/data1.csv");
+					if (file.exists()) {
+						file.delete();
+					}
+					FileOutputStream fos = new FileOutputStream(file);
+					fos.write(msg.getContent());
+					fos.close();
+					System.out.println("文件传输完成");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 		});
