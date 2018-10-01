@@ -62,18 +62,24 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 	@Override
 	public SocketSession createSocketSession(boolean isServerSide, SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
 		SocketSession socketSession = this.doCreateSocketSession(isServerSide, socketChannel, socketBossEventLoop, socketWorkEventLoop);
-		socketSession.getSocketSessionHandlerChain().addLast("SESSION_MANAGER", new DefaultSocketSessionHandler() {
+		socketSession.getSocketSessionHandlerChain().addLast("INTERNAL_SESSION_MANAGER", new DefaultSocketSessionHandler() {
 
 			@Override
 			public void onRegister(SocketSession session) {
 				onMonitorQueue.add(session);
-				DefaultSocketSessionManager.this.notify();
+				try {
+					DefaultSocketSessionManager.this.notify();
+				} catch (Exception e) {
+				}
 			}
 
 			@Override
 			public void unRegister(SocketSession session) {
 				onTimeoutQueue.add(session);
-				DefaultSocketSessionManager.this.notify();
+				try {
+					DefaultSocketSessionManager.this.notify();
+				} catch (Exception e) {
+				}
 			}
 
 		});
@@ -137,8 +143,11 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 				logger.debug("Attach session success [{}]", socketSession.toString());
 			}
 			while ((socketSession = this.onTimeoutQueue.poll()) != null) {
-				this.sessions.remove(socketSession.getSocketSessionSequence());
-				logger.debug("Detach session success [{}]", socketSession.toString());
+				String key = socketSession.getSocketSessionSequence();
+				if (this.sessions.containsKey(key)) {
+					this.sessions.remove(socketSession.getSocketSessionSequence());
+					logger.debug("Detach session success [{}]", socketSession.toString());
+				}
 			}
 
 			try {
@@ -172,7 +181,7 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 			SocketSession socketSession = entry.getValue();
 			long lastActiveTime = socketSession.getAcitveTime();
 			long currActiveTime = System.currentTimeMillis();
-			
+
 			if (currActiveTime - lastActiveTime > this.sessionTimeoutMillis) {
 				socketSession.getSocketBossEventLoop().doTimeout(socketSession);
 			}

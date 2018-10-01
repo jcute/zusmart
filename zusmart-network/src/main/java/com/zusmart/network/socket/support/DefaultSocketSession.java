@@ -241,12 +241,14 @@ public class DefaultSocketSession implements SocketSession {
 
 	@Override
 	public void fireUnRegister() {
-		this.socketWorkEventLoop.submit(new Runnable() {
-			@Override
-			public void run() {
-				socketSessionHandlerChain.fireUnRegister();
-			}
-		});
+		if(this.isOpen()) {
+			this.socketWorkEventLoop.submit(new Runnable() {
+				@Override
+				public void run() {
+					socketSessionHandlerChain.fireUnRegister();
+				}
+			});
+		}
 		CloseUtils.close(this.selectionKey);
 		CloseUtils.close(this.socketChannel);
 		this.selectionKey = null;

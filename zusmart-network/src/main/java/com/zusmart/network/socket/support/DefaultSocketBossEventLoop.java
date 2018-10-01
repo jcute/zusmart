@@ -128,7 +128,9 @@ public class DefaultSocketBossEventLoop extends AbstractEventLoop implements Soc
 	}
 
 	protected void wakeup() {
-		this.selector.wakeup();
+		if(this.running) {
+			this.selector.wakeup();
+		}
 	}
 
 	protected void process() {

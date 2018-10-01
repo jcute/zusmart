@@ -23,7 +23,7 @@ public class TestHttpClient implements SocketSessionAdapter{
 			@Override
 			public void onMessage(SocketSession session, Message message) {
 				System.err.println("客户端收到消息："+message);
-				session.close();
+//				session.close();
 			}
 		});
 	}

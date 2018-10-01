@@ -14,7 +14,7 @@ public class DefaultSocketSessionHandlerChain extends AbstractHandlerChain<Socke
 
 	public DefaultSocketSessionHandlerChain(SocketSession socketSession) {
 		if (null == socketSession) {
-			throw new IllegalArgumentException("socket session must not be null");
+			throw new IllegalArgumentException("Socket session must not be null");
 		}
 		this.socketSession = socketSession;
 	}

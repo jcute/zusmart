@@ -1,5 +1,7 @@
 package com.zusmart.network.support;
 
+import java.nio.channels.SocketChannel;
+
 import com.zusmart.basic.logging.Logger;
 import com.zusmart.basic.logging.LoggerFactory;
 import com.zusmart.network.NetAddress;
@@ -78,7 +80,6 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 		this.socketWorkEventLoopGroup.start();
 		this.socketBossEventLoopGroup.start();
 		this.socketConnector.start();
-		this.initSocketSessionListener(this.socketConnector.getSocketSession());
 		logger.info("Net Client Start Success");
 	}
 
@@ -95,21 +96,24 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 		logger.info("Net Client Close Success");
 	}
 
-	protected void initSocketSessionListener(SocketSession socketSession) {
-		socketSession.getSocketSessionHandlerChain().addLast("listener", new DefaultSocketSessionHandler() {
-			@Override
-			public void unRegister(SocketSession session) {
-				try {
-					DefaultNetClient.this.close();
-				} catch (Exception e) {
-					// IGNORE
-				}
-			}
-		});
-	}
-
 	protected SocketConnector createSocketConnector(NetAddress netAddress) {
-		return new DefaultSocketConnector(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress);
+		return new DefaultSocketConnector(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress) {
+			@Override
+			protected SocketSession createSocketSession(SocketChannel socketChannel) {
+				SocketSession socketSession = super.createSocketSession(socketChannel);
+				socketSession.getSocketSessionHandlerChain().addLast("INTERNAL_NETCLIENT_LISTENER", new DefaultSocketSessionHandler() {
+					@Override
+					public void unRegister(SocketSession session) {
+						try {
+							DefaultNetClient.this.close();
+						} catch (Exception e) {
+							// IGNORE
+						}
+					}
+				});
+				return socketSession;
+			}
+		};
 	}
 
 	protected SocketSessionSequenceGenerator createSocketSessionSequenceGenerator() {
