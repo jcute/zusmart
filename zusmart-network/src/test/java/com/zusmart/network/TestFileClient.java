@@ -34,7 +34,7 @@ public class TestFileClient implements SocketSessionAdapter {
 
 			@Override
 			public void onException(SocketSession session, Throwable cause) {
-				cause.printStackTrace();
+				
 			}
 		});
 	}

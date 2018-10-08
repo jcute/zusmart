@@ -21,7 +21,6 @@ public class StringMessageProtocol implements MessageProtocol {
 
 	@Override
 	public Message decode(Buffer buffer) throws Exception {
-		buffer.flip();
 		int index = buffer.indexOf(token);
 		if (index >= 0) {
 			String content = buffer.getString(Charset.UTF8, index + token.length);

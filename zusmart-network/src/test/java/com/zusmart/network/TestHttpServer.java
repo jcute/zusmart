@@ -46,7 +46,6 @@ public class TestHttpServer implements SocketSessionAdapter {
 
 			@Override
 			public void onException(SocketSession session, Throwable cause) {
-				cause.printStackTrace();
 			}
 
 		});

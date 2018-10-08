@@ -172,14 +172,12 @@ public class DefaultSocketSession implements SocketSession {
 	@Override
 	public void fireOnReadable() throws Exception {
 
-		if(null == this.readerBuffer){
-			this.readerBuffer = BufferFactory.allocate(this.readBufferSize,this.useDirect);
-		}
+		Buffer buffer = BufferFactory.allocate(this.readBufferSize, this.useDirect);
 		int limit = -1;
 		int total = 0;
 
 		try {
-			while ((limit = this.readerBuffer.read(this.socketChannel)) >= 0) {
+			while ((limit = buffer.read(this.socketChannel)) >= 0) {
 				if (limit == 0) {
 					break;
 				}
@@ -187,40 +185,58 @@ public class DefaultSocketSession implements SocketSession {
 			}
 			this.activeTime = System.currentTimeMillis();
 			this.readerDataLength += total;
-		} catch (ClosedChannelException e) {
-			this.readerBuffer.release();
-			this.readerBuffer = null;
-			this.fireUnRegister();
-			return;
-		} catch (Throwable e) {
-			this.readerBuffer.release();
-			this.readerBuffer = null;
-			this.fireOnException(e);
+		} catch (Exception e) {
+			buffer.release();
+			throw e;
 		}
 
 		if (total > 0) {
-			try {
-				Buffer buffer = this.readerBuffer.slice();
-				final Message message = this.messageProtocol.decode(buffer);
-				buffer.release();
-				if (null != message) {
-					this.readerBuffer.skip(buffer.limit());
-					this.socketWorkEventLoop.submit(new Runnable() {
-						@Override
-						public void run() {
-							socketSessionHandlerChain.fireOnMessage(message);
-						}
-					});
+			buffer.flip();
+			
+			if (null == this.readerBuffer) {
+				this.readerBuffer = buffer;
+			} else {
+				if (this.readerBuffer.remaining() < buffer.remaining()) {
+					Buffer newBuffer = BufferFactory.allocate(this.readerBuffer.position() + buffer.remaining(), this.useDirect).put(this.readerBuffer.flip());
+					this.readerBuffer.release();
+					this.readerBuffer = newBuffer;
 				}
-			} catch (Exception e) {
-				this.fireOnException(e);
+				this.readerBuffer.put(buffer);
+				this.readerBuffer.flip();
 			}
-
+			
+			try {
+				this.recognize(this.readerBuffer);
+			} finally {
+				if (this.readerBuffer.hasRemaining()) {
+					this.readerBuffer.compact();
+				} else {
+					this.readerBuffer.release();
+					this.readerBuffer = null;
+				}
+			}
 		}
 		if (limit < 0) {
 			this.fireUnRegister();
 		}
 
+	}
+
+	protected void recognize(Buffer content) throws Exception {
+		while (content.hasRemaining()) {
+			Buffer slice = content.asReadOnlyBuffer().slice();
+			final Message message = this.messageProtocol.decode(slice);
+			if (null == message) {
+				break;
+			}
+			content.skip(slice.position());
+			this.socketWorkEventLoop.submit(new Runnable() {
+				@Override
+				public void run() {
+					socketSessionHandlerChain.fireOnMessage(message);
+				}
+			});
+		}
 	}
 
 	@Override

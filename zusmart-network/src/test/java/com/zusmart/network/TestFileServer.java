@@ -38,7 +38,7 @@ public class TestFileServer implements SocketSessionAdapter {
 				ByteArrayMessage msg = (ByteArrayMessage) message;
 				System.out.println("接收文件大小为:" + msg.getContent().length);
 				try {
-					File file = new File("/Users/tangbin/Downloads/data1.csv");
+					File file = new File("C:\\Users\\koko\\Desktop\\JSON-A.js");
 					if (file.exists()) {
 						file.delete();
 					}

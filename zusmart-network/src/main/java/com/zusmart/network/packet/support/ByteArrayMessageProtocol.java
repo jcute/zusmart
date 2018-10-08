@@ -23,7 +23,6 @@ public class ByteArrayMessageProtocol extends SimpleMessageProtocol<ByteArrayMes
 
 	@Override
 	protected ByteArrayMessage doDecode(Buffer buffer) throws Exception {
-		buffer.flip();
 		if (buffer.remaining() < 4) {
 			return null;
 		}
