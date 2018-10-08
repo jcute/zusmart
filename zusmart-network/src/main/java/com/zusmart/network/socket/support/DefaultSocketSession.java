@@ -36,6 +36,7 @@ public class DefaultSocketSession implements SocketSession {
 
 	private Queue<Buffer> writerBufferQueue;
 	private Buffer writerBuffer;
+	private Buffer readerBuffer;
 
 	private long registTime;
 	private long activeTime;
@@ -171,12 +172,14 @@ public class DefaultSocketSession implements SocketSession {
 	@Override
 	public void fireOnReadable() throws Exception {
 
-		Buffer buffer = BufferFactory.allocate(this.readBufferSize, this.useDirect);
+		if(null == this.readerBuffer){
+			this.readerBuffer = BufferFactory.allocate(this.readBufferSize,this.useDirect);
+		}
 		int limit = -1;
 		int total = 0;
 
 		try {
-			while ((limit = buffer.read(this.socketChannel)) >= 0) {
+			while ((limit = this.readerBuffer.read(this.socketChannel)) >= 0) {
 				if (limit == 0) {
 					break;
 				}
@@ -185,19 +188,23 @@ public class DefaultSocketSession implements SocketSession {
 			this.activeTime = System.currentTimeMillis();
 			this.readerDataLength += total;
 		} catch (ClosedChannelException e) {
-			buffer.release();
+			this.readerBuffer.release();
+			this.readerBuffer = null;
 			this.fireUnRegister();
 			return;
 		} catch (Throwable e) {
-			buffer.release();
+			this.readerBuffer.release();
+			this.readerBuffer = null;
 			this.fireOnException(e);
 		}
 
 		if (total > 0) {
 			try {
+				Buffer buffer = this.readerBuffer.slice();
 				final Message message = this.messageProtocol.decode(buffer);
 				buffer.release();
 				if (null != message) {
+					this.readerBuffer.skip(buffer.limit());
 					this.socketWorkEventLoop.submit(new Runnable() {
 						@Override
 						public void run() {

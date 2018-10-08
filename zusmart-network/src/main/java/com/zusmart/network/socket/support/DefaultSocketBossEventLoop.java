@@ -188,13 +188,13 @@ public class DefaultSocketBossEventLoop extends AbstractEventLoop implements Soc
 				if (key.isValid() && key.isReadable()) {
 					try {
 						socketSession.fireOnReadable();
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						socketSession.fireOnException(e);
 					}
 				} else if (key.isValid() && key.isWritable()) {
 					try {
 						socketSession.fireOnWritable();
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						socketSession.fireOnException(e);
 					}
 				} else {
