@@ -155,7 +155,7 @@ public class DefaultSocketSession implements SocketSession {
 	public void fireOnRegister(Selector selector) throws Exception {
 		this.socketChannel.configureBlocking(false);
 		this.selectionKey = this.socketChannel.register(selector, EVENT_READABLE, this);
-		this.initSocketAddress();
+		this.initialSocketAddress();
 		this.writerBufferQueue = new LinkedList<Buffer>();
 		this.writerBuffer = null;
 		this.registTime = System.currentTimeMillis();
@@ -293,7 +293,7 @@ public class DefaultSocketSession implements SocketSession {
 		return String.format("SessionID:%s IsOpened:%s [%s -> %s]", this.getSocketSessionSequence(), this.isOpen(), this.isServerSide ? this.serverAddress : this.clientAddress, this.isServerSide ? this.clientAddress : this.serverAddress);
 	}
 
-	protected void initSocketAddress() {
+	protected void initialSocketAddress() {
 		if (this.isServerSide) {
 			this.serverAddress = NetAddress.create((InetSocketAddress) this.socketChannel.socket().getLocalSocketAddress());
 			this.clientAddress = NetAddress.create((InetSocketAddress) this.socketChannel.socket().getRemoteSocketAddress());

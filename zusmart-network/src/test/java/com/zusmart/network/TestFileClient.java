@@ -49,7 +49,7 @@ public class TestFileClient implements SocketSessionAdapter {
 		System.err.println(session);
 		
 		ByteArrayMessage msg = new ByteArrayMessage();
-		msg.setContent(file2byte("/Users/tangbin/Downloads/data.csv"));
+		msg.setContent(file2byte("C:\\Users\\koko\\Desktop\\JSON.js"));
 		System.out.println(msg.getContent().length);
 		session.writeAndFlush(msg);
 		
