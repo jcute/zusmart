@@ -97,7 +97,7 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 	}
 
 	protected SocketConnector createSocketConnector(NetAddress netAddress) {
-		return new DefaultSocketConnector(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress) {
+		return new DefaultSocketConnector(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress, this.getSetting()) {
 			@Override
 			protected SocketSession createSocketSession(SocketChannel socketChannel) {
 				SocketSession socketSession = super.createSocketSession(socketChannel);
@@ -123,7 +123,7 @@ public class DefaultNetClient extends AbstractNetNode implements NetClient {
 	protected SocketSessionManager createSocketSessionManager() {
 		NetClientSetting setting = this.getSetting();
 		SocketSessionSequenceGenerator generator = this.createSocketSessionSequenceGenerator();
-		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting.getSessionTimeoutMillis(), setting.getReadBufferSize(), setting.isUseDirect(), setting.getSessionTimeoutCheckInterval());
+		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting);
 	}
 
 	protected SocketBossEventLoopGroup createSocketBossEventLoopGroup() {

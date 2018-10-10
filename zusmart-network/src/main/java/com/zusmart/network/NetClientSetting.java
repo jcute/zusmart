@@ -13,6 +13,12 @@ public class NetClientSetting extends NetNodeSetting {
 	private int workThreadQueueSize = 512;
 	private long workThreadKeepAlive = 60 * 60 * 30;
 
+	private boolean keepAlive = true;
+	private int receiveBufferSize = 8192;
+	private int sendBufferSize = 8192;
+	private int soTimeout = 0;
+	private boolean tcpNpDelay = true;
+
 	public int getBossEventLoopSize() {
 		return bossEventLoopSize;
 	}
@@ -75,6 +81,46 @@ public class NetClientSetting extends NetNodeSetting {
 
 	public void setWorkThreadKeepAlive(long workThreadKeepAlive) {
 		this.workThreadKeepAlive = workThreadKeepAlive;
+	}
+
+	public boolean isKeepAlive() {
+		return keepAlive;
+	}
+
+	public void setKeepAlive(boolean keepAlive) {
+		this.keepAlive = keepAlive;
+	}
+
+	public int getReceiveBufferSize() {
+		return receiveBufferSize;
+	}
+
+	public void setReceiveBufferSize(int receiveBufferSize) {
+		this.receiveBufferSize = receiveBufferSize;
+	}
+
+	public int getSendBufferSize() {
+		return sendBufferSize;
+	}
+
+	public void setSendBufferSize(int sendBufferSize) {
+		this.sendBufferSize = sendBufferSize;
+	}
+
+	public int getSoTimeout() {
+		return soTimeout;
+	}
+
+	public void setSoTimeout(int soTimeout) {
+		this.soTimeout = soTimeout;
+	}
+
+	public boolean isTcpNpDelay() {
+		return tcpNpDelay;
+	}
+
+	public void setTcpNpDelay(boolean tcpNpDelay) {
+		this.tcpNpDelay = tcpNpDelay;
 	}
 
 }

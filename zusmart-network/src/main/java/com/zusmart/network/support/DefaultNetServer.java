@@ -98,7 +98,7 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	protected SocketSessionManager createSocketSessionManager() {
 		NetServerSetting setting = this.getSetting();
 		SocketSessionSequenceGenerator generator = this.createSocketSessionSequenceGenerator();
-		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting.getSessionTimeoutMillis(), setting.getReadBufferSize(), setting.isUseDirect(), setting.getSessionTimeoutCheckInterval());
+		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting);
 	}
 
 	protected SocketBossEventLoopGroup createSocketBossEventLoopGroup() {

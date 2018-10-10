@@ -15,6 +15,7 @@ import com.zusmart.basic.logging.Logger;
 import com.zusmart.basic.logging.LoggerFactory;
 import com.zusmart.basic.toolkit.support.AbstractExecutable;
 import com.zusmart.basic.util.StringUtils;
+import com.zusmart.network.NetNodeSetting;
 import com.zusmart.network.handler.support.DefaultSocketSessionHandler;
 import com.zusmart.network.socket.SocketBossEventLoop;
 import com.zusmart.network.socket.SocketSession;
@@ -28,10 +29,8 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 	private static final Logger logger = LoggerFactory.getLogger(DefaultSocketSessionManager.class);
 	private static final String thread_name = "session-manager";
 
-	private final long sessionTimeoutMillis;
-	private final int readBufferSize;
-	private final int checkInterval;
-	private final boolean useDirect;
+	private final NetNodeSetting netNodeSetting;
+
 	private final Map<String, SocketSession> sessions;
 	private final SocketSessionSequenceGenerator generator;
 	private final SocketSessionAdapter socketSessionAdapter;
@@ -42,16 +41,13 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 	private Thread monitor;
 	private volatile boolean running = false;
 
-	public DefaultSocketSessionManager(SocketSessionAdapter socketSessionAdapter, SocketSessionSequenceGenerator generator, long sessionTimeoutMillis, int readBufferSize, boolean useDirect, int checkInterval) {
-		this.sessionTimeoutMillis = sessionTimeoutMillis;
-		this.readBufferSize = readBufferSize;
-		this.useDirect = useDirect;
-		this.checkInterval = checkInterval;
+	public DefaultSocketSessionManager(SocketSessionAdapter socketSessionAdapter, SocketSessionSequenceGenerator generator, NetNodeSetting netNodeSetting) {
 		this.sessions = new HashMap<String, SocketSession>();
 		this.onTimeoutQueue = new LinkedList<SocketSession>();
 		this.onMonitorQueue = new LinkedList<SocketSession>();
-		this.socketSessionAdapter = socketSessionAdapter;
 		this.generator = generator;
+		this.netNodeSetting = netNodeSetting;
+		this.socketSessionAdapter = socketSessionAdapter;
 	}
 
 	@Override
@@ -153,7 +149,7 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 			try {
 				this.checkSessionTimeout();
 				synchronized (this) {
-					this.wait(this.checkInterval);
+					this.wait(this.netNodeSetting.getSessionTimeoutCheckInterval());
 				}
 			} catch (Exception e) {
 				logger.warn("Check session timeout thread error : {}", StringUtils.getExceptionMessage(e));
@@ -181,16 +177,16 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 			SocketSession socketSession = entry.getValue();
 			long lastActiveTime = socketSession.getAcitveTime();
 			long currActiveTime = System.currentTimeMillis();
-			if (currActiveTime - lastActiveTime > this.sessionTimeoutMillis) {
+			if (currActiveTime - lastActiveTime > this.netNodeSetting.getSessionTimeoutMillis()) {
 				socketSession.getSocketBossEventLoop().doTimeout(socketSession);
-				logger.debug("Client timeout and disconnect {}",socketSession);
+				logger.debug("Client timeout and disconnect {}", socketSession);
 			}
 		}
 	}
 
 	protected SocketSession doCreateSocketSession(boolean isServerSide, SocketChannel socketChannel, SocketBossEventLoop socketBossEventLoop, SocketWorkEventLoop socketWorkEventLoop) {
 		String socketSessionSequence = this.generator.create();
-		return new DefaultSocketSession(isServerSide, socketSessionSequence, socketChannel, socketBossEventLoop, socketWorkEventLoop, this.socketSessionAdapter, this.readBufferSize, this.useDirect);
+		return new DefaultSocketSession(isServerSide, socketSessionSequence, socketChannel, socketBossEventLoop, socketWorkEventLoop, this.socketSessionAdapter, this.netNodeSetting.getReadBufferSize(), this.netNodeSetting.isUseDirect());
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 
 import com.zusmart.basic.toolkit.support.AbstractExecutable;
 import com.zusmart.network.NetAddress;
+import com.zusmart.network.NetClientSetting;
 import com.zusmart.network.handler.support.DefaultSocketSessionHandler;
 import com.zusmart.network.socket.SocketBossEventLoop;
 import com.zusmart.network.socket.SocketBossEventLoopGroup;
@@ -19,6 +20,7 @@ import com.zusmart.network.util.CloseUtils;
 public class DefaultSocketConnector extends AbstractExecutable implements SocketConnector {
 
 	private final NetAddress netAddress;
+	private final NetClientSetting netClientSetting;
 	private final SocketSessionManager socketSessionManager;
 	private final SocketBossEventLoopGroup socketBossEventLoopGroup;
 	private final SocketWorkEventLoopGroup socketWorkEventLoopGroup;
@@ -28,7 +30,7 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 
 	private volatile boolean running = false;
 
-	public DefaultSocketConnector(SocketSessionManager socketSessionManager, SocketBossEventLoopGroup socketBossEventLoopGroup, SocketWorkEventLoopGroup socketWorkEventLoopGroup, NetAddress netAddress) {
+	public DefaultSocketConnector(SocketSessionManager socketSessionManager, SocketBossEventLoopGroup socketBossEventLoopGroup, SocketWorkEventLoopGroup socketWorkEventLoopGroup, NetAddress netAddress, NetClientSetting netClientSetting) {
 		if (null == netAddress) {
 			throw new IllegalArgumentException("net address must not be null");
 		}
@@ -41,7 +43,11 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 		if (null == socketWorkEventLoopGroup) {
 			throw new IllegalArgumentException("socket work event loop group must not be null");
 		}
+		if (null == netClientSetting) {
+			throw new IllegalArgumentException("net client setting must not be null");
+		}
 		this.netAddress = netAddress;
+		this.netClientSetting = netClientSetting;
 		this.socketSessionManager = socketSessionManager;
 		this.socketBossEventLoopGroup = socketBossEventLoopGroup;
 		this.socketWorkEventLoopGroup = socketWorkEventLoopGroup;
@@ -96,6 +102,13 @@ public class DefaultSocketConnector extends AbstractExecutable implements Socket
 		final CountDownLatch latch = new CountDownLatch(1);
 		this.running = true;
 		this.socketChannel = SocketChannel.open();
+
+		this.socketChannel.socket().setKeepAlive(this.netClientSetting.isKeepAlive());
+		this.socketChannel.socket().setReceiveBufferSize(this.netClientSetting.getReceiveBufferSize());
+		this.socketChannel.socket().setSendBufferSize(this.netClientSetting.getSendBufferSize());
+		this.socketChannel.socket().setSoTimeout(this.netClientSetting.getSoTimeout());
+		this.socketChannel.socket().setTcpNoDelay(this.netClientSetting.isTcpNpDelay());
+
 		this.socketChannel.connect(this.netAddress.toSocketAddress());
 		this.socketChannel.finishConnect();
 		this.socketSession = this.createSocketSession(this.socketChannel);
