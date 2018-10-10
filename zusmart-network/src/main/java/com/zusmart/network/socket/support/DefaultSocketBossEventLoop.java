@@ -79,7 +79,7 @@ public class DefaultSocketBossEventLoop extends AbstractEventLoop implements Soc
 	public void doListener(SocketSession socketSession, int events) {
 		if (this.inEventLoop()) {
 			this.handlerOnListenerNow(socketSession, events);
-		}else{
+		} else {
 			this.onListenerQueue.add(new SocketSessionUpdater(socketSession, events));
 			this.wakeup();
 		}
@@ -128,7 +128,7 @@ public class DefaultSocketBossEventLoop extends AbstractEventLoop implements Soc
 	}
 
 	protected void wakeup() {
-		if(this.running) {
+		if (this.running) {
 			this.selector.wakeup();
 		}
 	}
@@ -247,14 +247,7 @@ public class DefaultSocketBossEventLoop extends AbstractEventLoop implements Soc
 
 		Set<SelectionKey> keys = this.selector.keys();
 		for (SelectionKey key : keys) {
-			SocketSession socketSession = (SocketSession) key.attachment();
-			if (null != socketSession) {
-				try {
-					socketSession.fireUnRegister();
-				} catch (Exception e) {
-					logger.warn("Socket session close error : {}", StringUtils.getExceptionMessage(e));
-				}
-			}
+			key.attach(null);
 			CloseUtils.close(key);
 		}
 
