@@ -17,6 +17,10 @@ public class NetServerSetting extends NetNodeSetting {
 	private int workThreadQueueSize = 512;
 	private long workThreadKeepAlive = 60 * 60 * 30;
 
+	private boolean reuseAddress = true;
+	private int receiveBufferSize = 8192;
+	private int soTimeout = 0;
+
 	public int getBackLog() {
 		return backLog;
 	}
@@ -95,6 +99,30 @@ public class NetServerSetting extends NetNodeSetting {
 
 	public void setWorkThreadKeepAlive(long workThreadKeepAlive) {
 		this.workThreadKeepAlive = workThreadKeepAlive;
+	}
+
+	public boolean isReuseAddress() {
+		return reuseAddress;
+	}
+
+	public void setReuseAddress(boolean reuseAddress) {
+		this.reuseAddress = reuseAddress;
+	}
+
+	public int getReceiveBufferSize() {
+		return receiveBufferSize;
+	}
+
+	public void setReceiveBufferSize(int receiveBufferSize) {
+		this.receiveBufferSize = receiveBufferSize;
+	}
+
+	public int getSoTimeout() {
+		return soTimeout;
+	}
+
+	public void setSoTimeout(int soTimeout) {
+		this.soTimeout = soTimeout;
 	}
 
 }

@@ -13,6 +13,7 @@ import com.zusmart.basic.logging.LoggerFactory;
 import com.zusmart.basic.toolkit.support.AbstractExecutable;
 import com.zusmart.basic.util.StringUtils;
 import com.zusmart.network.NetAddress;
+import com.zusmart.network.NetServerSetting;
 import com.zusmart.network.socket.SocketAcceptor;
 import com.zusmart.network.socket.SocketBossEventLoop;
 import com.zusmart.network.socket.SocketBossEventLoopGroup;
@@ -26,8 +27,8 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultSocketAcceptor.class);
 
-	private final int backLog;
 	private final NetAddress netAddress;
+	private final NetServerSetting netServerSetting;
 	private final SocketSessionManager socketSessionManager;
 	private final SocketBossEventLoopGroup socketBossEventLoopGroup;
 	private final SocketWorkEventLoopGroup socketWorkEventLoopGroup;
@@ -38,7 +39,7 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 
 	private volatile boolean running = false;
 
-	public DefaultSocketAcceptor(SocketSessionManager socketSessionManager, SocketBossEventLoopGroup socketBossEventLoopGroup, SocketWorkEventLoopGroup socketWorkEventLoopGroup, NetAddress netAddress, String threadName, int backLog) {
+	public DefaultSocketAcceptor(SocketSessionManager socketSessionManager, SocketBossEventLoopGroup socketBossEventLoopGroup, SocketWorkEventLoopGroup socketWorkEventLoopGroup, NetAddress netAddress, NetServerSetting netServerSetting) {
 		if (null == netAddress) {
 			throw new IllegalArgumentException("net address must not be null");
 		}
@@ -51,12 +52,15 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 		if (null == socketWorkEventLoopGroup) {
 			throw new IllegalArgumentException("socket work event loop group must not be null");
 		}
-		this.backLog = backLog;
+		if (null == netServerSetting) {
+			throw new IllegalArgumentException("net server setting must not be null");
+		}
 		this.netAddress = netAddress;
+		this.netServerSetting = netServerSetting;
 		this.socketSessionManager = socketSessionManager;
 		this.socketBossEventLoopGroup = socketBossEventLoopGroup;
 		this.socketWorkEventLoopGroup = socketWorkEventLoopGroup;
-		this.monitor = new Thread(this, threadName);
+		this.monitor = new Thread(this, this.netServerSetting.getAcceptName());
 	}
 
 	@Override
@@ -95,7 +99,11 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 		this.running = true;
 		this.selector = Selector.open();
 		this.serverSocketChannel = ServerSocketChannel.open();
-		this.serverSocketChannel.socket().bind(this.netAddress.toSocketAddress(), this.backLog);
+		this.serverSocketChannel.socket().setReuseAddress(this.netServerSetting.isReuseAddress());
+		this.serverSocketChannel.socket().setReceiveBufferSize(this.netServerSetting.getReceiveBufferSize());
+		this.serverSocketChannel.socket().setSoTimeout(this.netServerSetting.getSoTimeout());
+
+		this.serverSocketChannel.socket().bind(this.netAddress.toSocketAddress(), this.netServerSetting.getBackLog());
 		this.serverSocketChannel.configureBlocking(false);
 		this.serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
 		this.monitor.start();
@@ -164,7 +172,7 @@ public class DefaultSocketAcceptor extends AbstractExecutable implements SocketA
 		SocketBossEventLoop socketBossEventLoop = this.socketBossEventLoopGroup.getEventLoop();
 		SocketWorkEventLoop socketWorkEventLoop = this.socketWorkEventLoopGroup.getEventLoop();
 		SocketChannel socketChannel = this.serverSocketChannel.accept();
-		SocketSession socketSession = this.socketSessionManager.createSocketSession(true,socketChannel, socketBossEventLoop, socketWorkEventLoop);
+		SocketSession socketSession = this.socketSessionManager.createSocketSession(true, socketChannel, socketBossEventLoop, socketWorkEventLoop);
 		socketBossEventLoop.doRegister(socketSession);
 	}
 

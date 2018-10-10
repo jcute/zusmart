@@ -19,9 +19,9 @@ import com.zusmart.network.socket.support.DefaultSocketWorkEventLoopGroup;
 import com.zusmart.network.util.CloseUtils;
 
 public class DefaultNetServer extends AbstractNetNode implements NetServer {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DefaultNetServer.class);
-	
+
 	private SocketAcceptor socketAcceptor;
 	private SocketSessionManager socketSessionManager;
 	private SocketBossEventLoopGroup socketBossEventLoopGroup;
@@ -54,7 +54,7 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	public SocketWorkEventLoopGroup getSocketWorkEventLoopGroup() {
 		return this.socketWorkEventLoopGroup;
 	}
-	
+
 	@Override
 	public SocketAcceptor getSocketAcceptor() {
 		return this.socketAcceptor;
@@ -64,7 +64,7 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	public SocketSessionManager getSocketSessionManager() {
 		return this.socketSessionManager;
 	}
-	
+
 	@Override
 	protected void doStart() throws Exception {
 		this.socketSessionManager.start();
@@ -88,8 +88,7 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	}
 
 	protected SocketAcceptor createSocketAcceptor(NetAddress netAddress) {
-		NetServerSetting setting = this.getSetting();
-		return new DefaultSocketAcceptor(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress, setting.getAcceptName(), setting.getBackLog());
+		return new DefaultSocketAcceptor(this.socketSessionManager, this.socketBossEventLoopGroup, this.socketWorkEventLoopGroup, netAddress, this.getSetting());
 	}
 
 	protected SocketSessionSequenceGenerator createSocketSessionSequenceGenerator() {
@@ -99,7 +98,7 @@ public class DefaultNetServer extends AbstractNetNode implements NetServer {
 	protected SocketSessionManager createSocketSessionManager() {
 		NetServerSetting setting = this.getSetting();
 		SocketSessionSequenceGenerator generator = this.createSocketSessionSequenceGenerator();
-		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting.getSessionTimeoutMillis(), setting.getReadBufferSize(), setting.isUseDirect(),setting.getSessionTimeoutCheckInterval());
+		return new DefaultSocketSessionManager(this.getSocketSessionAdapter(), generator, setting.getSessionTimeoutMillis(), setting.getReadBufferSize(), setting.isUseDirect(), setting.getSessionTimeoutCheckInterval());
 	}
 
 	protected SocketBossEventLoopGroup createSocketBossEventLoopGroup() {
