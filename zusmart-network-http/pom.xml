@@ -22,5 +22,10 @@
 			<artifactId>xlightweb</artifactId>
 			<version>2.13.2</version>
 		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.30.Final</version>
+		</dependency>
 	</dependencies>
 </project>
