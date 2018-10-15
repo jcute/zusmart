@@ -14,7 +14,8 @@ public final class Charset {
 
 	public static final Charset SYST = new Charset(System.getProperty("file.encoding"));
 	public static final Charset UTF8 = new Charset("UTF-8");
-
+	public static final Charset ASCII = new Charset("US-ASCII");
+	
 	private final java.nio.charset.Charset charset;
 	private final ThreadLocal<SoftReference<CharsetEncoder>> encoderCache;
 	private final ThreadLocal<SoftReference<CharsetDecoder>> decoderCache;
