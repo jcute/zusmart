@@ -4,7 +4,7 @@ package com.zusmart.basic.util;
 /**
  * Class处理工具类
  */
-public class ClassUtils {
+public abstract class ClassUtils {
 
 	/**
 	 * 获取默认的ClassLoader对象
