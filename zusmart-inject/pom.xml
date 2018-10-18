@@ -19,7 +19,7 @@
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
+			<artifactId>cglib-nodep</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
