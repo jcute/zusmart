@@ -18,6 +18,7 @@
 	<properties>
 		<maven.compiler.version>2.5.1</maven.compiler.version>
 		<maven.surefire.version>2.22.0</maven.surefire.version>
+		<maven.shade.version>2.4.3</maven.shade.version>
 
 		<project.build.version>1.6</project.build.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +30,7 @@
 		<log4j2.version>2.3</log4j2.version>
 		<junit.version>4.12</junit.version>
 		<cglib.version>3.2.8</cglib.version>
-		<objenesis.version>3.0</objenesis.version>
+		<objenesis.version>2.6</objenesis.version>
 
 	</properties>
 
@@ -69,6 +70,15 @@
 	</dependencyManagement>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>${maven.shade.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
