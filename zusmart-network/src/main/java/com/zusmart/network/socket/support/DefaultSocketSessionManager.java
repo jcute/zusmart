@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.zusmart.basic.logging.Logger;
 import com.zusmart.basic.logging.LoggerFactory;
@@ -43,8 +43,8 @@ public class DefaultSocketSessionManager extends AbstractExecutable implements S
 
 	public DefaultSocketSessionManager(SocketSessionAdapter socketSessionAdapter, SocketSessionSequenceGenerator generator, NetNodeSetting netNodeSetting) {
 		this.sessions = new HashMap<String, SocketSession>();
-		this.onTimeoutQueue = new LinkedList<SocketSession>();
-		this.onMonitorQueue = new LinkedList<SocketSession>();
+		this.onTimeoutQueue = new ConcurrentLinkedQueue<SocketSession>();
+		this.onMonitorQueue = new ConcurrentLinkedQueue<SocketSession>();
 		this.generator = generator;
 		this.netNodeSetting = netNodeSetting;
 		this.socketSessionAdapter = socketSessionAdapter;
