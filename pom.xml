@@ -13,6 +13,7 @@
 		<module>zusmart-inject</module>
 		<module>zusmart-network</module>
 		<module>zusmart-network-http</module>
+		<module>zusmart-boot</module>
 	</modules>
 
 	<properties>
